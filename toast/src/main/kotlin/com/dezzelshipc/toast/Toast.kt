@@ -31,6 +31,7 @@ import javafx.util.Duration
 import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
 import javafx.scene.text.TextAlignment
+import kotlin.system.exitProcess
 
 
 enum class ImageStyle {
@@ -57,7 +58,7 @@ enum class CornerSide {
 
 class Config {
     var width = 300.0
-    var height = 1000.0
+    var height = 0.0
     var windowPadding = 10.0
 
     var alpha = 0.9
@@ -92,17 +93,17 @@ class Toast {
     class Builder {
         private var config = Config()
 
-        fun setAppName(text: String, style: String = config.appNameStyle): Builder {
+        fun setAppName(text: String = config.appName, style: String = config.appNameStyle): Builder {
             config.appName = text
             config.appNameStyle = style
             return this
         }
-        fun setTitle(text: String, style: String = config.titleStyle): Builder {
+        fun setTitle(text: String = config.title, style: String = config.titleStyle): Builder {
             config.title = text
             config.titleStyle = style
             return this
         }
-        fun setMessage(text: String, style: String = config.messageStyle): Builder {
+        fun setMessage(text: String = config.message, style: String = config.messageStyle): Builder {
             config.message = text
             config.messageStyle = style
             return this
@@ -131,12 +132,34 @@ class Toast {
             config.buttonText[buttonNum] = str
             return this
         }
+        fun setWindowWidth(width: Double): Builder {
+            config.width = width
+            return this
+        }
+        /**
+        * @param[height] 0.0 height for auto
+        */
+        fun setWindowHeight(height: Double): Builder {
+            config.height = height
+            return this
+        }
         fun setWindowPadding(padding: Double): Builder {
             config.windowPadding = padding
             return this
         }
         fun setContentPadding(padding: Double): Builder {
             config.textPadding = padding
+            return this
+        }
+        fun setOpacity(opacity: Double): Builder {
+            config.alpha = opacity
+            return this
+        }
+        /**
+         * @param[time] milliseconds until closing
+         */
+        fun setOpenTime(time: Double): Builder {
+            config.openTime = time
             return this
         }
         fun build(): Toast  {
@@ -166,10 +189,6 @@ class Toast {
         message.isWrapText = true
         appName.isWrapText = true
 
-        title.applyCss()
-        message.applyCss()
-        appName.applyCss()
-
         vbox.children.addAll(title, message, appName)
 
         if (config.buttonText[0].isNotEmpty()) {
@@ -187,8 +206,6 @@ class Toast {
         }
 
         vbox.padding = Insets(0.0,0.0,0.0,10.0)
-        vbox.autosize()
-
         box.children.add(vbox)
         box.padding = Insets(config.textPadding)
 
@@ -196,12 +213,10 @@ class Toast {
 
         windows.initStyle(StageStyle.TRANSPARENT)
 
-        //config.height = box.height
-
         root.maxWidth = config.width
         root.minWidth = config.width
 
-        windows.scene = Scene(root, config.width, 1000.0)
+        windows.scene = Scene(root, config.width, config.height)
         windows.scene.fill = Color.TRANSPARENT
 
     }
@@ -290,7 +305,7 @@ class Toast {
                 anim.cycleCount = 1
                 anim.onFinished = EventHandler {
                     Platform.exit()
-                    System.exit(0)
+                    exitProcess(0)
                 }
                 anim.play()
             }
@@ -306,7 +321,7 @@ class Toast {
                 val animation = Timeline(keyFrame)
                 animation.onFinished = EventHandler {
                     Platform.exit()
-                    System.exit(0)
+                    exitProcess(0)
                 }
                 animation.play()
             }
@@ -316,9 +331,11 @@ class Toast {
     fun start() {
         windows.show()
 
-        windows.scene.root.autosize()
-        config.height = root.height
-        windows.height = config.height
+        if (config.height <= 0.0) {
+            windows.scene.root.autosize()
+            config.height = root.height
+            windows.height = config.height
+        }
         setCorner()
 
         openAnimation()
@@ -340,12 +357,17 @@ class SomeClass: Application() {
     override fun start(p0: Stage?) {
         val toast = Toast.Builder()
             .setTitle("T.N.T")
-            .setMessage("kasj fhkjashdflkjsad")
-            .setAppName("acdc")
-            .setCornerSide(CornerSide.RIGHT_DOWN)
-            .setAnimation(Animation.MOVE)
-            .setButtonText(1, "")
+            .setMessage("kasj fhkjashdflkjsad  aopisd joasjd lkajsd;l kjalk joihj oiufh aiojhfojawhefohaoiwehfoi uawhefouh awieufh uiawehf uhawefiu hawipf hiupaewh fiuha weiufh iauwehfi hawepifh pawehfpiu")
+            .setAppName("acdc", "-fx-text-fill: red")
+            .setCornerSide(CornerSide.RIGHT_UP)
+            .setAnimation(Animation.FADE)
+            .setImageType(ImageStyle.RECTANGLE)
+            .setButtonText(1, "Вторая Кнопка")
             .setMusicVolume(0.0)
+            .setWindowWidth(300.0)
+            .setWindowHeight(0.0)
+            .setOpenTime(3000.0)
+            .setOpacity(1.0)
             .build()
         toast.start()
 
