@@ -36,6 +36,14 @@ class Window {
         createButton("invert")
         createButton("bright")
         createButton("gauss")
+        createButton("scalePix")
+        createButton("scale%")
+        createButton("movePix")
+        createButton("move%")
+        createButton("rotate")
+        createButton("addTextPix")
+        createButton("addText%")
+        createButton("merge")
 
         val end = EndNode()
         end.layoutX = width - end.rootPane!!.prefWidth - 10
@@ -58,6 +66,14 @@ class Window {
             "invert" -> InvertNode()
             "bright" -> BrightnessNode()
             "gauss" -> GaussNode()
+            "scalePix" -> TScalePixelNode()
+            "scale%" -> TScalePercentNode()
+            "movePix" -> TMovePixelsNode()
+            "move%" -> TMovePercentNode()
+            "rotate" -> TRotateNode()
+            "addTextPix" -> AddTextPixelNode()
+            "addText%" -> AddTextPercentNode()
+            "merge" -> MergeNode()
             else -> IntNode()
         }
     }

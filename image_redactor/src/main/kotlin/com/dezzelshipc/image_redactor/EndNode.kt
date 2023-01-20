@@ -57,6 +57,8 @@ class EndNode : ImageNode() {
     }
 
     override fun addInit() {
+        rootPane!!.onDragDetected = null
+
         nodes["firstLink"] = Triple(firstLink!!, null, NodeTypes.IMAGE)
 
         (firstLink!!.children.find { it is Label } as Label).text = "img"

@@ -1,16 +1,11 @@
 package com.dezzelshipc.image_redactor
 
-import javafx.event.EventHandler
 import javafx.fxml.FXML
-import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import javafx.scene.image.ImageView
 import javafx.scene.layout.AnchorPane
-import org.opencv.core.Core
-import org.opencv.core.CvType
-import org.opencv.core.Mat
-import org.opencv.core.Size
+import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
 import kotlin.math.roundToInt
 
@@ -36,8 +31,8 @@ class IntNode : ValueNode() {
         }
     }
 
-    override fun getValue(): Int? {
-        return valueField!!.text.toIntOrNull()
+    override fun getValue(): Int {
+        return valueField!!.text.toIntOrNull() ?: return 0
     }
 
     override fun setImageView() {}
@@ -56,8 +51,8 @@ class FloatNode : ValueNode() {
         }
     }
 
-    override fun getValue(): Float? {
-        return valueField!!.text.toFloatOrNull()
+    override fun getValue(): Float {
+        return valueField!!.text.toFloatOrNull() ?: return 0.0f
     }
 
     override fun setImageView() {}
@@ -273,4 +268,411 @@ class GaussNode : ImageNode() {
         init("TwoNodesIV.fxml")
     }
 
+}
+
+class TScalePixelNode : ImageNode() {
+    @FXML
+    var secondLink: AnchorPane? = null
+
+    @FXML
+    var thirdLink: AnchorPane? = null
+    override fun addInit() {
+        titleBar!!.text = "ScalePix"
+
+        nodes["firstLink"] = Triple(firstLink!!, null, NodeTypes.IMAGE)
+        nodes["secondLink"] = Triple(secondLink!!, null, NodeTypes.INT)
+        nodes["thirdLink"] = Triple(thirdLink!!, null, NodeTypes.INT)
+
+        (firstLink!!.children.find { it is Label } as Label).text = "img"
+        (secondLink!!.children.find { it is Label } as Label).text = "i_x"
+        (thirdLink!!.children.find { it is Label } as Label).text = "i_y"
+    }
+
+    override fun getValue(): Mat? {
+        val mat = nodes["firstLink"]!!.second?.getValue() as Mat? ?: return null
+        val x = nodes["secondLink"]!!.second?.getValue() as Int? ?: return null
+        val y = nodes["thirdLink"]!!.second?.getValue() as Int? ?: return null
+
+        if (x <= 0 || y <= 0)
+            return null
+
+        val mat2 = Mat()
+        mat.copyTo(mat2)
+        Imgproc.resize(mat, mat2, Size(x.toDouble(), y.toDouble()))
+
+        return mat2
+    }
+
+    init {
+        init("ThreeNodesIV.fxml")
+    }
+
+}
+
+class TScalePercentNode : ImageNode() {
+    @FXML
+    var secondLink: AnchorPane? = null
+
+    @FXML
+    var thirdLink: AnchorPane? = null
+    override fun addInit() {
+        titleBar!!.text = "Scale%"
+
+        nodes["firstLink"] = Triple(firstLink!!, null, NodeTypes.IMAGE)
+        nodes["secondLink"] = Triple(secondLink!!, null, NodeTypes.FLOAT)
+        nodes["thirdLink"] = Triple(thirdLink!!, null, NodeTypes.FLOAT)
+
+        (firstLink!!.children.find { it is Label } as Label).text = "img"
+        (secondLink!!.children.find { it is Label } as Label).text = "f_x"
+        (thirdLink!!.children.find { it is Label } as Label).text = "f_y"
+    }
+
+    override fun getValue(): Mat? {
+        val mat = nodes["firstLink"]!!.second?.getValue() as Mat? ?: return null
+        val px = nodes["secondLink"]!!.second?.getValue() as Float? ?: return null
+        val py = nodes["thirdLink"]!!.second?.getValue() as Float? ?: return null
+
+        val x = mat.cols() * px / 100
+        val y = mat.rows() * py / 100
+
+        if (x <= 0 || y <= 0)
+            return null
+
+        val mat2 = Mat()
+        mat.copyTo(mat2)
+        Imgproc.resize(mat, mat2, Size(x.toDouble(), y.toDouble()))
+
+        return mat2
+    }
+
+    init {
+        init("ThreeNodesIV.fxml")
+    }
+
+}
+
+class TMovePixelsNode : ImageNode() {
+    @FXML
+    var secondLink: AnchorPane? = null
+
+    @FXML
+    var thirdLink: AnchorPane? = null
+    override fun addInit() {
+        titleBar!!.text = "Move"
+
+        nodes["firstLink"] = Triple(firstLink!!, null, NodeTypes.IMAGE)
+        nodes["secondLink"] = Triple(secondLink!!, null, NodeTypes.INT)
+        nodes["thirdLink"] = Triple(thirdLink!!, null, NodeTypes.INT)
+
+        (firstLink!!.children.find { it is Label } as Label).text = "img"
+        (secondLink!!.children.find { it is Label } as Label).text = "i_x"
+        (thirdLink!!.children.find { it is Label } as Label).text = "i_y"
+    }
+
+    override fun getValue(): Mat? {
+        val mat = nodes["firstLink"]!!.second?.getValue() as Mat? ?: return null
+        val x = nodes["secondLink"]!!.second?.getValue() as Int? ?: return null
+        val y = nodes["thirdLink"]!!.second?.getValue() as Int? ?: return null
+
+        val mat2 = Mat()
+        mat.copyTo(mat2)
+
+        val moveMat = Mat(2, 3, CvType.CV_64FC1)
+        val row = 0
+        val col = 0
+        moveMat.put(
+            row, col, 1.0, 0.0, x.toDouble(), 0.0, 1.0, y.toDouble()
+        )
+
+        Imgproc.warpAffine(mat, mat2, moveMat, Size(mat.cols().toDouble(), mat.rows().toDouble()))
+
+        return mat2
+    }
+
+    init {
+        init("ThreeNodesIV.fxml")
+    }
+
+}
+
+class TMovePercentNode : ImageNode() {
+    @FXML
+    var secondLink: AnchorPane? = null
+
+    @FXML
+    var thirdLink: AnchorPane? = null
+    override fun addInit() {
+        titleBar!!.text = "Move"
+
+        nodes["firstLink"] = Triple(firstLink!!, null, NodeTypes.IMAGE)
+        nodes["secondLink"] = Triple(secondLink!!, null, NodeTypes.FLOAT)
+        nodes["thirdLink"] = Triple(thirdLink!!, null, NodeTypes.FLOAT)
+
+        (firstLink!!.children.find { it is Label } as Label).text = "img"
+        (secondLink!!.children.find { it is Label } as Label).text = "f_x"
+        (thirdLink!!.children.find { it is Label } as Label).text = "f_y"
+    }
+
+    override fun getValue(): Mat? {
+        val mat = nodes["firstLink"]!!.second?.getValue() as Mat? ?: return null
+        val px = nodes["secondLink"]!!.second?.getValue() as Float? ?: return null
+        val py = nodes["thirdLink"]!!.second?.getValue() as Float? ?: return null
+
+        val mat2 = Mat()
+        mat.copyTo(mat2)
+
+        val moveMat = Mat(2, 3, CvType.CV_64FC1)
+        val row = 0
+        val col = 0
+        moveMat.put(
+            row, col, 1.0, 0.0, (mat.cols() * px / 100.0), 0.0, 1.0, (mat.rows() * py / 100.0)
+        )
+
+        Imgproc.warpAffine(mat, mat2, moveMat, Size(mat.cols().toDouble(), mat.rows().toDouble()))
+
+        return mat2
+    }
+
+    init {
+        init("ThreeNodesIV.fxml")
+    }
+
+}
+
+class TRotateNode : ImageNode() {
+    @FXML
+    var secondLink: AnchorPane? = null
+
+    override fun addInit() {
+        titleBar!!.text = "Rotate"
+
+        nodes["firstLink"] = Triple(firstLink!!, null, NodeTypes.IMAGE)
+        nodes["secondLink"] = Triple(secondLink!!, null, NodeTypes.FLOAT)
+
+        (firstLink!!.children.find { it is Label } as Label).text = "img"
+        (secondLink!!.children.find { it is Label } as Label).text = "f_deg"
+    }
+
+    override fun getValue(): Mat? {
+        val mat = nodes["firstLink"]!!.second?.getValue() as Mat? ?: return null
+        val deg = nodes["secondLink"]!!.second?.getValue() as Float? ?: return null
+
+        val mat2 = Mat()
+        mat.copyTo(mat2)
+
+        val rotMat = Imgproc.getRotationMatrix2D(Point(mat.cols() / 2.0, mat.rows() / 2.0), deg.toDouble(), 1.0)
+
+        Imgproc.warpAffine(mat, mat2, rotMat, Size(mat.cols().toDouble(), mat.rows().toDouble()))
+
+        return mat2
+    }
+
+    init {
+        init("TwoNodesIV.fxml")
+    }
+}
+
+class AddTextPixelNode : ImageNode() {
+    @FXML
+    var secondLink: AnchorPane? = null
+
+    @FXML
+    var thirdLink: AnchorPane? = null
+
+    @FXML
+    var fourthLink: AnchorPane? = null
+
+    @FXML
+    var fifthLink: AnchorPane? = null
+
+    override fun addInit() {
+        titleBar!!.text = "AddText"
+
+        nodes["firstLink"] = Triple(firstLink!!, null, NodeTypes.IMAGE)
+        nodes["secondLink"] = Triple(secondLink!!, null, NodeTypes.INT)
+        nodes["thirdLink"] = Triple(thirdLink!!, null, NodeTypes.INT)
+        nodes["fourthLink"] = Triple(fourthLink!!, null, NodeTypes.STRING)
+        nodes["fifthLink"] = Triple(fifthLink!!, null, NodeTypes.FLOAT)
+
+        (firstLink!!.children.find { it is Label } as Label).text = "img"
+        (secondLink!!.children.find { it is Label } as Label).text = "intx"
+        (thirdLink!!.children.find { it is Label } as Label).text = "inty"
+        (fourthLink!!.children.find { it is Label } as Label).text = "str"
+        (fourthLink!!.children.find { it is Label } as Label).text = "float"
+        (fifthLink!!.children.find { it is Label } as Label).text = "fl_scale"
+    }
+
+    override fun getValue(): Mat? {
+        val mat = nodes["firstLink"]!!.second?.getValue() as Mat? ?: return null
+        val x = nodes["secondLink"]!!.second?.getValue() as Int? ?: return null
+        val y = nodes["thirdLink"]!!.second?.getValue() as Int? ?: return null
+        val str = nodes["fourthLink"]!!.second?.getValue() as String? ?: return null
+        val scale = nodes["fifthLink"]!!.second?.getValue() as Float? ?: return null
+
+        val mat2 = Mat()
+        mat.copyTo(mat2)
+
+        Imgproc.putText(
+            mat2,
+            str,
+            Point(x.toDouble(), y.toDouble()),
+            0,
+            scale.toDouble(),
+            Scalar(255.0, 255.0, 255.0),
+            scale.toInt()
+        )
+
+        return mat2
+    }
+
+    init {
+        init("FiveNodesIV.fxml")
+    }
+}
+
+class AddTextPercentNode : ImageNode() {
+    @FXML
+    var secondLink: AnchorPane? = null
+
+    @FXML
+    var thirdLink: AnchorPane? = null
+
+    @FXML
+    var fourthLink: AnchorPane? = null
+
+    @FXML
+    var fifthLink: AnchorPane? = null
+
+    override fun addInit() {
+        titleBar!!.text = "AddText"
+
+        nodes["firstLink"] = Triple(firstLink!!, null, NodeTypes.IMAGE)
+        nodes["secondLink"] = Triple(secondLink!!, null, NodeTypes.FLOAT)
+        nodes["thirdLink"] = Triple(thirdLink!!, null, NodeTypes.FLOAT)
+        nodes["fourthLink"] = Triple(fourthLink!!, null, NodeTypes.STRING)
+        nodes["fifthLink"] = Triple(fifthLink!!, null, NodeTypes.FLOAT)
+
+        (firstLink!!.children.find { it is Label } as Label).text = "img"
+        (secondLink!!.children.find { it is Label } as Label).text = "fl_x"
+        (thirdLink!!.children.find { it is Label } as Label).text = "fl_y"
+        (fourthLink!!.children.find { it is Label } as Label).text = "str"
+        (fifthLink!!.children.find { it is Label } as Label).text = "fl_scale"
+    }
+
+    override fun getValue(): Mat? {
+        val mat = nodes["firstLink"]!!.second?.getValue() as Mat? ?: return null
+        val px = nodes["secondLink"]!!.second?.getValue() as Float? ?: return null
+        val py = nodes["thirdLink"]!!.second?.getValue() as Float? ?: return null
+        val str = nodes["fourthLink"]!!.second?.getValue() as String? ?: return null
+        val scale = nodes["fifthLink"]!!.second?.getValue() as Float? ?: return null
+
+        val mat2 = Mat()
+        mat.copyTo(mat2)
+
+        Imgproc.putText(
+            mat2,
+            str,
+            Point(mat.cols() * px / 100.0, mat.rows() * py / 100.0),
+            0,
+            scale.toDouble(),
+            Scalar(255.0, 255.0, 255.0),
+            2
+        )
+
+        return mat2
+    }
+
+    init {
+        init("FiveNodesIV.fxml")
+    }
+}
+
+class MergeNode : ImageNode() {
+    @FXML
+    var secondLink: AnchorPane? = null
+
+    @FXML
+    var thirdLink: AnchorPane? = null
+
+    @FXML
+    var fourthLink: AnchorPane? = null
+
+    override fun addInit() {
+        titleBar!!.text = "Merge"
+
+        nodes["firstLink"] = Triple(firstLink!!, null, NodeTypes.IMAGE)
+        nodes["secondLink"] = Triple(secondLink!!, null, NodeTypes.IMAGE)
+        nodes["thirdLink"] = Triple(thirdLink!!, null, NodeTypes.INT)
+        nodes["fourthLink"] = Triple(fourthLink!!, null, NodeTypes.INT)
+
+        (firstLink!!.children.find { it is Label } as Label).text = "img"
+        (secondLink!!.children.find { it is Label } as Label).text = "img2"
+        (thirdLink!!.children.find { it is Label } as Label).text = "i_x"
+        (fourthLink!!.children.find { it is Label } as Label).text = "i_y"
+    }
+
+    override fun getValue(): Mat? {
+        val image = nodes["firstLink"]!!.second?.getValue() as Mat? ?: return null
+        val image2 = nodes["secondLink"]!!.second?.getValue() as Mat? ?: return null
+        val sx = nodes["thirdLink"]!!.second?.getValue() as Int? ?: return null
+        val sy = nodes["fourthLink"]!!.second?.getValue() as Int? ?: return null
+
+//        try {
+//
+//            val mat = matM.submat(0, mat1.rows() - 1, 0, mat1.cols() - 1)
+//            val mat1grey = Mat()
+//            mat1.copyTo(mat1grey)
+//            Imgproc.cvtColor(mat1, mat1grey, Imgproc.COLOR_BGR2GRAY)
+//            val mask = Mat()
+//            mat1grey.copyTo(mask)
+//            Imgproc.threshold(mat1grey, mask, 10.0, 255.0, Imgproc.THRESH_BINARY)
+//            val maskInv = Mat()
+//            mask.copyTo(maskInv)
+//            Core.bitwise_not(mask, maskInv)
+//            val img1bg = Mat()
+//            img1bg.copySize(mat)
+//            Core.bitwise_and(mat, mat, img1bg, maskInv)
+//            val img2fg = Mat()
+//            mat1.copyTo(img2fg)
+//            Core.bitwise_and(mat1, mat1, img2fg, mask)
+//
+//            val matAdd = Mat()
+//            Core.add(mat, mat1, matAdd)
+//
+//            val matOut = Mat()
+//            matM.copyTo(matOut)
+//            matOut.pu
+//
+//            return matOut
+//        } catch (e: Error) {
+//            imageView!!.isVisible = false
+//            return null
+//        }
+
+        val newImage = Mat()
+        image.copyTo(newImage)
+
+        val imageData = ByteArray(((image.total() * image.channels()).toInt()))
+        image.get(0, 0, imageData)
+        val imageData2 = ByteArray(((image.total() * image.channels()).toInt()))
+        image2.get(0, 0, imageData2)
+
+        for (y in 0 until image2.rows()) {
+            for (x in 0 until image2.cols()) {
+                for (c in 0 until image2.channels()) {
+                    if (0 <= sy + y && sy + y < image.rows() && 0 <= sx + x && sx + x < image.cols()) {
+                        imageData[((sy + y) * image.cols() + sx + x) * image.channels() + c] =
+                            imageData2[(y * image2.cols() + x) * image2.channels() + c]
+                    }
+                }
+            }
+        }
+        newImage.put(0, 0, imageData)
+
+        return newImage
+    }
+
+    init {
+        init("FourNodesIV.fxml")
+    }
 }
