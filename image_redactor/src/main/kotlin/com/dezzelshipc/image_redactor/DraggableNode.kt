@@ -214,13 +214,4 @@ abstract class DraggableNode : AnchorPane() {
     abstract fun getValue(): Any?
 
     abstract fun setImageView()
-
-//    init {
-//        init("DraggableNode.fxml")
-//    }
-}
-
-fun className(someClass: Any): String {
-    val name = someClass::class.toString()
-    return name.slice(IntRange(name.indexOfLast { it == '.' } + 1, name.length - 1))
 }

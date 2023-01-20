@@ -13,9 +13,9 @@ class NodeLink : AnchorPane() {
     @FXML
     var nodeLink: CubicCurve? = null
 
-    var inputNode: DraggableNode? = null
-    var inputLinkString: String = ""
-    var outputNode: DraggableNode? = null
+    private var inputNode: DraggableNode? = null
+    private var inputLinkString: String = ""
+    private var outputNode: DraggableNode? = null
 
     @FXML
     private fun initialize() {
@@ -26,7 +26,6 @@ class NodeLink : AnchorPane() {
 
         parentProperty().addListener { _, _, _ ->
             if (parent == null) {
-
                 if (inputNode != null) {
                     inputNode!!.connectedLinks.remove(this)
                     if (outputNode != null && inputNode!!.nodes.containsKey(inputLinkString)) {
@@ -68,15 +67,11 @@ class NodeLink : AnchorPane() {
         source1.connectedLinks.add(this)
         source2.connectedLinks.add(this)
 
-        if(updateImage(outputNode!!))
+        if (updateImage(outputNode!!))
             kickAction()
     }
 
-    fun updateImage(node: DraggableNode) : Boolean {
-//        print(node.nodes)
-//        print(" ")
-//        println(node)
-        //print(node.nodes.all { it.value.second != null })
+    private fun updateImage(node: DraggableNode): Boolean {
         if (node.nodes.all { it.value.second != null }) {
             node.setImageView()
             return true

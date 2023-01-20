@@ -52,7 +52,7 @@ class Window {
 
         root.children.add(vBox)
 
-        return Scene(root, width, height);
+        return Scene(root, width, height)
     }
 
     private fun getNode(str: String): DraggableNode {
@@ -83,7 +83,6 @@ class Window {
 
 
 class DnD2 : Application() {
-
     override fun start(primaryStage: Stage) {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
         primaryStage.scene = Window().start()

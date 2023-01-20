@@ -617,38 +617,6 @@ class MergeNode : ImageNode() {
         val sx = nodes["thirdLink"]!!.second?.getValue() as Int? ?: return null
         val sy = nodes["fourthLink"]!!.second?.getValue() as Int? ?: return null
 
-//        try {
-//
-//            val mat = matM.submat(0, mat1.rows() - 1, 0, mat1.cols() - 1)
-//            val mat1grey = Mat()
-//            mat1.copyTo(mat1grey)
-//            Imgproc.cvtColor(mat1, mat1grey, Imgproc.COLOR_BGR2GRAY)
-//            val mask = Mat()
-//            mat1grey.copyTo(mask)
-//            Imgproc.threshold(mat1grey, mask, 10.0, 255.0, Imgproc.THRESH_BINARY)
-//            val maskInv = Mat()
-//            mask.copyTo(maskInv)
-//            Core.bitwise_not(mask, maskInv)
-//            val img1bg = Mat()
-//            img1bg.copySize(mat)
-//            Core.bitwise_and(mat, mat, img1bg, maskInv)
-//            val img2fg = Mat()
-//            mat1.copyTo(img2fg)
-//            Core.bitwise_and(mat1, mat1, img2fg, mask)
-//
-//            val matAdd = Mat()
-//            Core.add(mat, mat1, matAdd)
-//
-//            val matOut = Mat()
-//            matM.copyTo(matOut)
-//            matOut.pu
-//
-//            return matOut
-//        } catch (e: Error) {
-//            imageView!!.isVisible = false
-//            return null
-//        }
-
         val newImage = Mat()
         image.copyTo(newImage)
 
