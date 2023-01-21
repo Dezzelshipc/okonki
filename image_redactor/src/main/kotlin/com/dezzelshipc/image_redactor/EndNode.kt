@@ -29,7 +29,7 @@ class ImgNode : ImageNode() {
             val file = fileChooser.showOpenDialog(scene.window)
             if (file != null) {
                 imageMat = Imgcodecs.imread(file.absolutePath)
-                setImageView()
+                updateNode()
                 imageView!!.isVisible = true
                 outputLink?.kickAction()
             }

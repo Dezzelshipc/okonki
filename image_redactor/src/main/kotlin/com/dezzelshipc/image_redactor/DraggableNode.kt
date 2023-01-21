@@ -8,6 +8,9 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.input.*
 import javafx.scene.layout.AnchorPane
+import javafx.scene.paint.Paint
+import javafx.scene.shape.Circle
+import org.opencv.core.Mat
 import java.io.IOException
 import java.util.*
 
@@ -71,8 +74,8 @@ abstract class DraggableNode : AnchorPane() {
     }
 
     open fun initHandles() {
-        if (this.outputLinkHandle != null)
-            this.outputLinkHandle!!.onDragDetected = linkDragDetected
+        if (outputLinkHandle != null)
+            outputLinkHandle!!.onDragDetected = linkDragDetected
     }
 
     open fun addInit() {}
@@ -163,7 +166,6 @@ abstract class DraggableNode : AnchorPane() {
 
             superParent!!.children.add(0, link)
             nodeDragStart.outputLink = link
-            nodeDragStart.outputLinkHandle = src
 
             nodes[src.id] = nodes[src.id]!!.copy(second = nodeDragStart)
             link.bindStartEnd(nodeDragStart, this, anchorDragStart, event.source as AnchorPane)
@@ -213,5 +215,18 @@ abstract class DraggableNode : AnchorPane() {
 
     abstract fun getValue(): Any?
 
-    abstract fun setImageView()
+    abstract fun updateNode()
+
+    fun errorNode(str: String): Mat? {
+        if (nodes.containsKey(str)) {
+            (nodes[str]!!.first.children.find { it is Circle } as Circle).fill = Paint.valueOf(Colors.RED)
+        }
+        return null
+    }
+
+    fun goodNodes() {
+        nodes.forEach {
+            (it.value.first.children.find { it2 -> it2 is Circle } as Circle).fill = Paint.valueOf(Colors.BLUE)
+        }
+    }
 }

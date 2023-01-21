@@ -67,13 +67,13 @@ class NodeLink : AnchorPane() {
         source1.connectedLinks.add(this)
         source2.connectedLinks.add(this)
 
-        if (updateImage(outputNode!!))
+        if (updateNode(outputNode!!))
             kickAction()
     }
 
-    private fun updateImage(node: DraggableNode): Boolean {
+    private fun updateNode(node: DraggableNode): Boolean {
         if (node.nodes.all { it.value.second != null }) {
-            node.setImageView()
+            node.updateNode()
             return true
         }
         return false
@@ -83,7 +83,7 @@ class NodeLink : AnchorPane() {
         if (inputNode == null)
             return
 
-        if (updateImage(inputNode!!) && inputNode!!.outputLink != null)
+        if (updateNode(inputNode!!) && inputNode!!.outputLink != null)
             inputNode!!.outputLink!!.kickAction()
     }
 

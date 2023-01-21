@@ -10,6 +10,23 @@ enum class NodeTypes {
     INT, FLOAT, STRING, IMAGE, NONE
 }
 
+class Colors {
+    companion object {
+        const val BLUE = "#1e90ff"
+        const val RED = "#ff0000"
+    }
+}
+
+class Link {
+    companion object {
+        const val FIRST = "firstLink"
+        const val SECOND = "secondLink"
+        const val THIRD = "thirdLink"
+        const val FOURTH = "fourthLink"
+        const val FIFTH = "fifthLink"
+    }
+}
+
 class Utility {
     companion object {
         fun matToImage(mat: Mat): Image {

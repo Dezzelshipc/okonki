@@ -30,8 +30,7 @@
                 </AnchorPane>
                 <Button fx:id="deleteButton" mnemonicParsing="false" text="X" GridPane.columnIndex="1"
                         GridPane.rowIndex="2"/>
-                <AnchorPane fx:id="firstLink" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="25.0"
-                            styleClass="leftLinkHandle">
+                <AnchorPane fx:id="firstLink" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="25.0">
                     <children>
                         <Circle fill="DODGERBLUE" layoutX="13.0" layoutY="17.0" radius="14.0" stroke="BLACK"
                                 strokeType="INSIDE"/>
