@@ -13,9 +13,11 @@ class NodeLink : AnchorPane() {
     @FXML
     var nodeLink: CubicCurve? = null
 
-    private var inputNode: DraggableNode? = null
     private var inputLinkString: String = ""
+    private var inputNode: DraggableNode? = null
     private var outputNode: DraggableNode? = null
+    private var inputAnchor: AnchorPane? = null
+    private var outputAnchor: AnchorPane? = null
 
     @FXML
     private fun initialize() {
@@ -58,6 +60,8 @@ class NodeLink : AnchorPane() {
         nodeLink!!.endYProperty().bind(Bindings.add(source2.layoutYProperty(), a2.layoutY + a2.height / 2.0))
 
         inputLinkString = a2.id
+        outputAnchor = a1
+        inputAnchor = a2
         links(source1, source2)
     }
 
@@ -87,6 +91,23 @@ class NodeLink : AnchorPane() {
             inputNode!!.outputLink!!.kickAction()
     }
 
+    fun toData(): LinkData {
+        return LinkData(
+            id,
+            inputNode?.id,
+            inputNode!!::class.simpleName,
+            outputNode?.id,
+            outputNode!!::class.simpleName,
+            inputAnchor?.id,
+            PairD(inputAnchor!!.layoutX + inputAnchor!!.width / 2, inputAnchor!!.layoutY + inputAnchor!!.height / 2),
+            outputAnchor?.id,
+            PairD(
+                outputAnchor!!.layoutX + outputAnchor!!.width / 2,
+                outputAnchor!!.layoutY + outputAnchor!!.height / 2
+            ),
+        )
+    }
+
     init {
         val fxmlLoader = FXMLLoader(
             javaClass.getResource("NodeLink.fxml")
@@ -101,3 +122,17 @@ class NodeLink : AnchorPane() {
         id = UUID.randomUUID().toString()
     }
 }
+
+data class PairD<A, B>(val first: A, val second: B)
+
+data class LinkData(
+    val id: String?,
+    val inputNode: String?,
+    val inputNodeClass: String?,
+    val outputNode: String?,
+    val outputNodeClass: String?,
+    val inputAnchor: String?,
+    val inputAnchorSize: PairD<Double, Double>,
+    val outputAnchor: String?,
+    val outputAnchorSize: PairD<Double, Double>
+)

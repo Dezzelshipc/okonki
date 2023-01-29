@@ -6,7 +6,8 @@ module com.dezzelshipc.image_redactor {
     requires org.controlsfx.controls;
     requires opencv;
     requires java.desktop;
+    requires com.google.gson;
 
-    opens com.dezzelshipc.image_redactor to javafx.fxml;
+    opens com.dezzelshipc.image_redactor to javafx.fxml, com.google.gson;
     exports com.dezzelshipc.image_redactor;
 }

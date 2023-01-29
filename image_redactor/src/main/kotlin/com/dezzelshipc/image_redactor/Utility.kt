@@ -14,6 +14,7 @@ class Colors {
     companion object {
         const val BLUE = "#1e90ff"
         const val RED = "#ff0000"
+        const val BLACK = "#000000"
     }
 }
 

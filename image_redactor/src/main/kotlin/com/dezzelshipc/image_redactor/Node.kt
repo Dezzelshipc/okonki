@@ -27,6 +27,17 @@ abstract class ValueNode : DraggableNode() {
             (outputLinkHandle!!.children.find { it is Circle } as Circle).fill = Paint.valueOf(Colors.RED)
         }
     }
+
+    override fun toData(): NodeData {
+        val data = super.toData()
+        data.data = valueField!!.text
+        return data
+    }
+
+    override fun fromData(nodeData: NodeData) {
+        super.fromData(nodeData)
+        valueField!!.text = nodeData.data
+    }
 }
 
 class IntNode : ValueNode() {

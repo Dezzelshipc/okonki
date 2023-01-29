@@ -4,6 +4,7 @@ import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.paint.Paint
 import javafx.stage.FileChooser
 import org.opencv.core.Mat
 import org.opencv.imgcodecs.Imgcodecs
@@ -16,9 +17,17 @@ class ImgNode : ImageNode() {
     var openButton: Button? = null
 
     private var imageMat: Mat? = null
+    private var path: String? = null
 
     override fun getValue(): Mat? {
         return imageMat
+    }
+
+    fun getImage() {
+        imageMat = Imgcodecs.imread(path)
+        updateNode()
+        imageView!!.isVisible = true
+        outputLink?.kickAction()
     }
 
     override fun addInit() {
@@ -28,13 +37,22 @@ class ImgNode : ImageNode() {
             fileChooser.title = "Open Image File"
             val file = fileChooser.showOpenDialog(scene.window)
             if (file != null) {
-                imageMat = Imgcodecs.imread(file.absolutePath)
-                updateNode()
-                imageView!!.isVisible = true
-                outputLink?.kickAction()
+                path = file.absolutePath
+                getImage()
             }
-
         }
+    }
+
+    override fun toData(): NodeData {
+        val data = super.toData()
+        data.data = path
+        return data
+    }
+
+    override fun fromData(nodeData: NodeData) {
+        super.fromData(nodeData)
+        path = nodeData.data
+        getImage()
     }
 
     init {
@@ -71,6 +89,18 @@ class EndNode : ImageNode() {
                     println(e)
                 }
             }
+        }
+    }
+
+    override fun updateNode() {
+        goodNodes()
+        val v = getValue()
+        if (v != null) {
+            imageView!!.isVisible = true
+            imageView!!.image = Utility.matToImage(v)
+            saveButton!!.textFill = Paint.valueOf(Colors.BLACK)
+        } else {
+            saveButton!!.textFill = Paint.valueOf(Colors.RED)
         }
     }
 

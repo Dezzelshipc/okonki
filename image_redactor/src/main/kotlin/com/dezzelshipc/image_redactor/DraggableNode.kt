@@ -117,6 +117,23 @@ abstract class DraggableNode : AnchorPane() {
         }
     }
 
+    fun linkNodes(
+        source1: DraggableNode,
+        source2: DraggableNode,
+        a1: AnchorPane,
+        a2: AnchorPane,
+        nodeId: String
+    ): NodeLink {
+        val link = NodeLink()
+
+        superParent!!.children.add(0, link)
+        source1.outputLink = link
+
+        nodes[nodeId] = nodes[nodeId]!!.copy(second = source1)
+        link.bindStartEnd(source1, source2, a1, a2)
+        return link
+    }
+
     fun linkHandlers() {
 
         linkDragDetected = EventHandler { event ->
@@ -162,13 +179,7 @@ abstract class DraggableNode : AnchorPane() {
             myLink.isVisible = false
             superParent!!.children.removeAt(0)
 
-            val link = NodeLink()
-
-            superParent!!.children.add(0, link)
-            nodeDragStart.outputLink = link
-
-            nodes[src.id] = nodes[src.id]!!.copy(second = nodeDragStart)
-            link.bindStartEnd(nodeDragStart, this, anchorDragStart, event.source as AnchorPane)
+            linkNodes(nodeDragStart, this, anchorDragStart, event.source as AnchorPane, src.id)
 
 //            val content = ClipboardContent()
 //            content[stateAddLink] = "link"
@@ -229,4 +240,16 @@ abstract class DraggableNode : AnchorPane() {
             (it.value.first.children.find { it2 -> it2 is Circle } as Circle).fill = Paint.valueOf(Colors.BLUE)
         }
     }
+
+    open fun toData(): NodeData {
+        return NodeData(id, this::class.simpleName!!, rootPane?.layoutX, rootPane?.layoutY, null)
+    }
+
+    open fun fromData(nodeData: NodeData) {
+        id = nodeData.id
+        layoutX = nodeData.x ?: 100.0
+        layoutY = nodeData.y ?: 100.0
+    }
 }
+
+data class NodeData(val id: String, val name: String, val x: Double?, val y: Double?, var data: String?)
